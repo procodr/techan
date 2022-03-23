@@ -96,3 +96,39 @@ func (pgi percentChangeIndicator) Calculate(index int) big.Decimal {
 	cplast := pgi.Indicator.Calculate(index - 1)
 	return cp.Div(cplast).Sub(big.ONE)
 }
+
+type changeIndicator struct {
+	Indicator
+}
+
+func NewChangeIndicator(indicator Indicator) Indicator {
+	return changeIndicator{indicator}
+}
+
+func (ci changeIndicator) Calculate(index int) big.Decimal {
+	if index == 0 {
+		return big.ZERO
+	}
+
+	ch := ci.Indicator.Calculate(index)
+	chlast := ci.Indicator.Calculate(index - 1)
+	return ch.Sub(chlast)
+}
+
+type absoluteChangeIndicator struct {
+	Indicator
+}
+
+func NewAbsoluteChangeIndicator(indicator Indicator) Indicator {
+	return absoluteChangeIndicator{indicator}
+}
+
+func (aci absoluteChangeIndicator) Calculate(index int) big.Decimal {
+	if index == 0 {
+		return big.ZERO
+	}
+
+	ch := aci.Indicator.Calculate(index)
+	chlast := aci.Indicator.Calculate(index - 1)
+	return ch.Sub(chlast).Abs()
+}
