@@ -1,11 +1,15 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+	"sync"
+)
 
 type modifiedMovingAverageIndicator struct {
 	indicator   Indicator
 	window      int
 	resultCache resultCache
+	mu          *sync.RWMutex
 }
 
 // NewMMAIndicator returns a derivative indciator which returns the modified moving average of the underlying
@@ -16,6 +20,7 @@ func NewMMAIndicator(indicator Indicator, window int) Indicator {
 		indicator:   indicator,
 		window:      window,
 		resultCache: make([]*big.Decimal, 10000),
+		mu:          &sync.RWMutex{},
 	}
 }
 
@@ -40,9 +45,27 @@ func (mma modifiedMovingAverageIndicator) cache() resultCache {
 }
 
 func (mma *modifiedMovingAverageIndicator) setCache(cache resultCache) {
+	mma.mu.Lock()
 	mma.resultCache = cache
+	mma.mu.Unlock()
 }
 
 func (mma modifiedMovingAverageIndicator) windowSize() int {
 	return mma.window
+}
+
+func (mma *modifiedMovingAverageIndicator) Lock() {
+	mma.mu.Lock()
+}
+
+func (mma *modifiedMovingAverageIndicator) Unlock() {
+	mma.mu.Unlock()
+}
+
+func (mma *modifiedMovingAverageIndicator) RLock() {
+	mma.mu.RLock()
+}
+
+func (mma *modifiedMovingAverageIndicator) RUnlock() {
+	mma.mu.RUnlock()
 }

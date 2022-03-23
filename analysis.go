@@ -143,6 +143,9 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 		return 0
 	}
 
+	baha.TimeSeries.Mu.RLock()
+	defer baha.TimeSeries.Mu.RUnlock()
+
 	openOrder := Order{
 		Side:   BUY,
 		Amount: big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice),

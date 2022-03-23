@@ -1,12 +1,16 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+	"sync"
+)
 
 type emaIndicator struct {
 	indicator   Indicator
 	window      int
 	alpha       big.Decimal
 	resultCache resultCache
+	mu          *sync.RWMutex
 }
 
 // NewEMAIndicator returns a derivative indicator which returns the average of the current and preceding values in
@@ -18,6 +22,7 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 		window:      window,
 		alpha:       big.ONE.Frac(2).Div(big.NewFromInt(window + 1)),
 		resultCache: make([]*big.Decimal, 1000),
+		mu:          &sync.RWMutex{},
 	}
 }
 
@@ -39,7 +44,25 @@ func (ema *emaIndicator) Calculate(index int) big.Decimal {
 func (ema emaIndicator) cache() resultCache { return ema.resultCache }
 
 func (ema *emaIndicator) setCache(newCache resultCache) {
+	ema.mu.Lock()
 	ema.resultCache = newCache
+	ema.mu.Unlock()
 }
 
 func (ema emaIndicator) windowSize() int { return ema.window }
+
+func (ema *emaIndicator) Lock() {
+	ema.mu.Lock()
+}
+
+func (ema *emaIndicator) Unlock() {
+	ema.mu.Unlock()
+}
+
+func (ema *emaIndicator) RLock() {
+	ema.mu.RLock()
+}
+
+func (ema *emaIndicator) RUnlock() {
+	ema.mu.RUnlock()
+}

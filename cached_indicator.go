@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+)
 
 type resultCache []*big.Decimal
 
@@ -9,11 +11,17 @@ type cachedIndicator interface {
 	cache() resultCache
 	setCache(cache resultCache)
 	windowSize() int
+	Lock()
+	Unlock()
+	RLock()
+	RUnlock()
 }
 
 func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 	if index < len(indicator.cache()) {
+		indicator.Lock()
 		indicator.cache()[index] = &val
+		indicator.Unlock()
 	} else if index == len(indicator.cache()) {
 		indicator.setCache(append(indicator.cache(), &val))
 	} else {
@@ -23,6 +31,9 @@ func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 }
 
 func expandResultCache(indicator cachedIndicator, newSize int) {
+	indicator.Lock()
+	defer indicator.Unlock()
+
 	sizeDiff := newSize - len(indicator.cache())
 
 	expansion := make([]*big.Decimal, sizeDiff)

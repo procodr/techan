@@ -12,6 +12,9 @@ func NewVolumeIndicator(series *TimeSeries) Indicator {
 }
 
 func (vi volumeIndicator) Calculate(index int) big.Decimal {
+	vi.Mu.RLock()
+	defer vi.Mu.RUnlock()
+
 	return vi.Candles[index].Volume
 }
 
@@ -25,6 +28,9 @@ func NewClosePriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (cpi closePriceIndicator) Calculate(index int) big.Decimal {
+	cpi.Mu.RLock()
+	defer cpi.Mu.RUnlock()
+
 	return cpi.Candles[index].ClosePrice
 }
 
@@ -40,6 +46,9 @@ func NewHighPriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (hpi highPriceIndicator) Calculate(index int) big.Decimal {
+	hpi.Mu.RLock()
+	defer hpi.Mu.RUnlock()
+
 	return hpi.Candles[index].MaxPrice
 }
 
@@ -55,6 +64,9 @@ func NewLowPriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (lpi lowPriceIndicator) Calculate(index int) big.Decimal {
+	lpi.Mu.RLock()
+	defer lpi.Mu.RUnlock()
+
 	return lpi.Candles[index].MinPrice
 }
 
@@ -70,6 +82,9 @@ func NewOpenPriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (opi openPriceIndicator) Calculate(index int) big.Decimal {
+	opi.Mu.RLock()
+	defer opi.Mu.RUnlock()
+
 	return opi.Candles[index].OpenPrice
 }
 
@@ -84,6 +99,9 @@ func NewTypicalPriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (tpi typicalPriceIndicator) Calculate(index int) big.Decimal {
+	tpi.Mu.RLock()
+	defer tpi.Mu.RUnlock()
+
 	numerator := tpi.Candles[index].MaxPrice.Add(tpi.Candles[index].MinPrice).Add(tpi.Candles[index].ClosePrice)
 	return numerator.Div(big.NewFromString("3"))
 }

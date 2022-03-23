@@ -20,6 +20,9 @@ func (tri trueRangeIndicator) Calculate(index int) big.Decimal {
 		return big.ZERO
 	}
 
+	tri.series.Mu.RLock()
+	defer tri.series.Mu.RUnlock()
+
 	candle := tri.series.Candles[index]
 	previousClose := tri.series.Candles[index-1].ClosePrice
 
