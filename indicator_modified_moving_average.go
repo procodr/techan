@@ -12,8 +12,8 @@ type modifiedMovingAverageIndicator struct {
 	mu          *sync.RWMutex
 }
 
-// NewMMAIndicator returns a derivative indciator which returns the modified moving average of the underlying
-// indictator. An in-depth explanation can be found here:
+// NewMMAIndicator returns a derivative indicator which returns the modified moving average of the underlying
+// indicator. An in-depth explanation can be found here:
 // https://en.wikipedia.org/wiki/Moving_average#Modified_moving_average
 func NewMMAIndicator(indicator Indicator, window int) Indicator {
 	return &modifiedMovingAverageIndicator{
