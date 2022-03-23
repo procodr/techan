@@ -18,7 +18,8 @@ func TestCommidityChannelIndexIndicator_Calculate(t *testing.T) {
 
 	series := mockTimeSeries(typicalPrices...)
 
-	cci := NewCCIIndicator(series, 20)
+	typicalPriceIndicator := NewTypicalPriceIndicator(series)
+	cci := NewCCIIndicator(typicalPriceIndicator, 20)
 
 	results := []string{"101.9185", "31.1946", "6.5578", "33.6078", "34.9686", "13.6027",
 		"-10.6789", "-11.4710", "-29.2567", "-128.6000", "-72.7273"}
