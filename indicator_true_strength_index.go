@@ -37,19 +37,39 @@ func (tsi *trueStrengthIndexIndicator) Calculate(index int) big.Decimal {
 	return tsi.oneHundred.Mul(avgPriceChange.Div(avgAbsPriceChange))
 }
 
-type trueStrengthIndexSignalIndicator struct {
+type trueStrengthIndexEmaSignalIndicator struct {
 	avgTsi Indicator
 	window int
 }
 
-func NewTrueStrengthIndexSignalIndicator(tsi Indicator, window int) Indicator {
-	return &trueStrengthIndexSignalIndicator{
+func NewTrueStrengthIndexEmaSignalIndicator(tsi Indicator, window int) Indicator {
+	return &trueStrengthIndexEmaSignalIndicator{
 		avgTsi: NewEMAIndicator(tsi, window),
 		window: window,
 	}
 }
 
-func (ts *trueStrengthIndexSignalIndicator) Calculate(index int) big.Decimal {
+func (ts *trueStrengthIndexEmaSignalIndicator) Calculate(index int) big.Decimal {
+	if index < ts.window-1 {
+		return big.ZERO
+	}
+
+	return ts.avgTsi.Calculate(index)
+}
+
+type trueStrengthIndexSmaSignalIndicator struct {
+	avgTsi Indicator
+	window int
+}
+
+func NewTrueStrengthIndexSmaSignalIndicator(tsi Indicator, window int) Indicator {
+	return &trueStrengthIndexSmaSignalIndicator{
+		avgTsi: NewSimpleMovingAverage(tsi, window),
+		window: window,
+	}
+}
+
+func (ts *trueStrengthIndexSmaSignalIndicator) Calculate(index int) big.Decimal {
 	if index < ts.window-1 {
 		return big.ZERO
 	}
