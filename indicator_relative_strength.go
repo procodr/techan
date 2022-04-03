@@ -58,3 +58,43 @@ func (rs relativeStrengthIndicator) Calculate(index int) big.Decimal {
 
 	return avgGain.Div(avgLoss)
 }
+
+type relativeStrengthIndexEmaSignalIndicator struct {
+	emaRsi Indicator
+	window int
+}
+
+func NewRelativeStrengthIndexEmaSignalIndicator(rsi Indicator, window int) Indicator {
+	return &relativeStrengthIndexEmaSignalIndicator{
+		emaRsi: NewEMAIndicator(rsi, window),
+		window: window,
+	}
+}
+
+func (rsiEmaS *relativeStrengthIndexEmaSignalIndicator) Calculate(index int) big.Decimal {
+	if index < rsiEmaS.window-1 {
+		return big.ZERO
+	}
+
+	return rsiEmaS.emaRsi.Calculate(index)
+}
+
+type relativeStrengthIndexSmaSignalIndicator struct {
+	smaRsi Indicator
+	window int
+}
+
+func NewRelativeStrengthIndexSmaSignalIndicator(rsi Indicator, window int) Indicator {
+	return &relativeStrengthIndexSmaSignalIndicator{
+		smaRsi: NewSimpleMovingAverage(rsi, window),
+		window: window,
+	}
+}
+
+func (rsiSmaS *relativeStrengthIndexSmaSignalIndicator) Calculate(index int) big.Decimal {
+	if index < rsiSmaS.window-1 {
+		return big.ZERO
+	}
+
+	return rsiSmaS.smaRsi.Calculate(index)
+}

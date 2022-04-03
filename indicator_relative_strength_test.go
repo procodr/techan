@@ -55,3 +55,27 @@ func TestRelativeStrengthIndicatorNoPriceChange(t *testing.T) {
 	rsInd := NewRelativeStrengthIndicator(close, 2)
 	assert.Equal(t, big.NewDecimal(math.Inf(1)).FormattedString(2), rsInd.Calculate(1).FormattedString(2))
 }
+
+func TestRelativeStrengthIndexEmaSignalIndicator(t *testing.T) {
+	indicator := NewRelativeStrengthIndexEmaSignalIndicator(
+		NewRelativeStrengthIndexIndicator(NewClosePriceIndicator(mockedTimeSeries), 3),
+		3)
+
+	expectedValues := []float64{
+		0, 0, 0, 0, 0, 0, 28.9976, 41.5364, 31.4937, 38.1338, 26.144, 23.7117,
+	}
+
+	indicatorEquals(t, expectedValues, indicator)
+}
+
+func TestRelativeStrengthIndexSmaSignalIndicator(t *testing.T) {
+	indicator := NewRelativeStrengthIndexSmaSignalIndicator(
+		NewRelativeStrengthIndexIndicator(NewClosePriceIndicator(mockedTimeSeries), 3),
+		3)
+
+	expectedValues := []float64{
+		0, 0, 0, 0, 0, 0, 19.3317, 37.3568, 44.5071, 40.1, 26.7931, 26.7359,
+	}
+
+	indicatorEquals(t, expectedValues, indicator)
+}
