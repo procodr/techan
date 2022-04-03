@@ -41,12 +41,33 @@ func (ema *emaIndicator) Calculate(index int) big.Decimal {
 	return result
 }
 
-func (ema emaIndicator) cache() resultCache { return ema.resultCache }
+func (ema emaIndicator) cache() resultCache {
+	return ema.resultCache
+}
+
+func (ema *emaIndicator) setCacheEntry(index int, val *big.Decimal) {
+	ema.mu.Lock()
+	defer ema.mu.Unlock()
+
+	ema.resultCache[index] = val
+}
+
+func (ema *emaIndicator) getCacheEntry(index int) big.Decimal {
+	ema.mu.RLock()
+	defer ema.mu.RUnlock()
+
+	if ema.resultCache[index] != nil {
+		return *ema.resultCache[index]
+	} else {
+		return big.NaN
+	}
+}
 
 func (ema *emaIndicator) setCache(newCache resultCache) {
 	ema.mu.Lock()
+	defer ema.mu.Unlock()
+
 	ema.resultCache = newCache
-	ema.mu.Unlock()
 }
 
 func (ema emaIndicator) windowSize() int { return ema.window }

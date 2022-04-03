@@ -44,10 +44,29 @@ func (mma modifiedMovingAverageIndicator) cache() resultCache {
 	return mma.resultCache
 }
 
+func (mma *modifiedMovingAverageIndicator) setCacheEntry(index int, val *big.Decimal) {
+	mma.mu.Lock()
+	defer mma.mu.Unlock()
+
+	mma.resultCache[index] = val
+}
+
+func (mma *modifiedMovingAverageIndicator) getCacheEntry(index int) big.Decimal {
+	mma.mu.RLock()
+	defer mma.mu.RUnlock()
+
+	if mma.resultCache[index] != nil {
+		return *mma.resultCache[index]
+	} else {
+		return big.NaN
+	}
+}
+
 func (mma *modifiedMovingAverageIndicator) setCache(cache resultCache) {
 	mma.mu.Lock()
+	defer mma.mu.Unlock()
+
 	mma.resultCache = cache
-	mma.mu.Unlock()
 }
 
 func (mma modifiedMovingAverageIndicator) windowSize() int {

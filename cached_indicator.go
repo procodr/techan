@@ -9,7 +9,9 @@ type resultCache []*big.Decimal
 type cachedIndicator interface {
 	Indicator
 	cache() resultCache
+	getCacheEntry(index int) big.Decimal
 	setCache(cache resultCache)
+	setCacheEntry(index int, val *big.Decimal)
 	windowSize() int
 	Lock()
 	Unlock()
@@ -19,9 +21,7 @@ type cachedIndicator interface {
 
 func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 	if index < len(indicator.cache()) {
-		indicator.Lock()
-		indicator.cache()[index] = &val
-		indicator.Unlock()
+		indicator.setCacheEntry(index, &val)
 	} else if index == len(indicator.cache()) {
 		indicator.setCache(append(indicator.cache(), &val))
 	} else {
@@ -31,9 +31,6 @@ func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 }
 
 func expandResultCache(indicator cachedIndicator, newSize int) {
-	indicator.Lock()
-	defer indicator.Unlock()
-
 	sizeDiff := newSize - len(indicator.cache())
 
 	expansion := make([]*big.Decimal, sizeDiff)
@@ -45,8 +42,8 @@ func returnIfCached(indicator cachedIndicator, index int, firstValueFallback fun
 		expandResultCache(indicator, index+1)
 	} else if index < indicator.windowSize()-1 {
 		return &big.ZERO
-	} else if val := indicator.cache()[index]; val != nil {
-		return val
+	} else if val := indicator.getCacheEntry(index); val != big.NaN {
+		return &val
 	} else if index == indicator.windowSize()-1 {
 		value := firstValueFallback(index)
 		cacheResult(indicator, index, value)
